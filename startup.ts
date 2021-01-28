@@ -1,54 +1,63 @@
-import * as express from 'express';
+import "reflect-metadata";
 import * as  bodyParser from 'body-parser';
 import * as cors from 'cors'
+import { Container } from 'inversify';
+import { InversifyExpressServer, TYPE } from 'inversify-express-utils';
+import { Application } from "express";
+
+
 
 import Database from  './configuration/database'
 import LojasController from './controller/lojasController'
-import IdeaisDeCadastrosController from './controller/ideaisDeCadastrosController'
+import  './controller/ideaisDeCadastrosController'
+import  './controller/lojasController'
 
 class StartUp{
-    public app: express.Application;
+    public server: InversifyExpressServer;
     private _db : Database;
-    private bodyParser;
+    private container : Container
 
     constructor(){
-        this.app = express();
+        this.container = new Container();
+        this.server =  new InversifyExpressServer(this.container);
         this._db = new Database();
         this._db.createConnection();
-        this.middler();
-        this.routes();
+   
     }
 
-    enableCors(){
+    configServer(){
+        this.server.setConfig((app) =>{
+            app.use(bodyParser.urlencoded({ extended: false}));
+            app.use(bodyParser.json());
+            this.enableCors(app);
+        })
+    }
+
+    enableCors(app : Application){
         const options: cors.CorsOptions = {
             methods: "GET,OPTIONS,PUT,POST,DELETE,PATCH",
             origin: "*"
         }
-
-        this.app.use(cors(options)); 
+        app.use(cors(options)); 
     }
 
-    middler(){
-        this.enableCors();
-        this.app.use(bodyParser.json());
-        this.app.use(bodyParser.urlencoded({ extended: false}));
-    }
+  
 
     routes(){
-        this.app.route('/').get((req,res) => {
-            res.send({ versao: '0.0.1'})
-        })
+        // this.app.route('/').get((req,res) => {
+        //     res.send({ versao: '0.0.1'})
+        // })
         
-        //lojas
-        this.app.route('/api/v1/lojas').get(LojasController.get);
-        this.app.route('/api/v1/lojas').post(LojasController.post);
-        this.app.route('/api/v1/lojas/:idloja').get(LojasController.getById);
-        this.app.route('/api/v1/lojas/:idloja').patch(LojasController.patchById);
-        this.app.route('/api/v1/lojas/:idloja').delete(LojasController.deleteById);
+        // //lojas
+        // this.app.route('/api/v1/lojas').get(LojasController.get);
+        // this.app.route('/api/v1/lojas').post(LojasController.post);
+        // this.app.route('/api/v1/lojas/:idloja').get(LojasController.getById);
+        // this.app.route('/api/v1/lojas/:idloja').patch(LojasController.patchById);
+        // this.app.route('/api/v1/lojas/:idloja').delete(LojasController.deleteById);
         
-        //ideiais de cadastros
-        this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros').post(IdeaisDeCadastrosController.post);
-        this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros/:idealcadastroid').get(IdeaisDeCadastrosController.getById);
+        // //ideiais de cadastros
+        // this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros').post(IdeaisDeCadastrosController.post);
+        // this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros/:idealcadastroid').get(IdeaisDeCadastrosController.getById);
     }
 
 }

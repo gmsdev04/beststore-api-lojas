@@ -2,7 +2,9 @@ import * as HttpStatus from 'http-status'
 import LojasService from '../services/lojasService'
 
 import {Request, Response} from 'express'
+import { controller, httpGet } from 'inversify-express-utils';
 
+@controller('/api/v1/lojas')
 class LojasController {
     get(req : Request,res : Response){
         LojasService.get()
@@ -18,8 +20,11 @@ class LojasController {
         .catch(error => console.error.bind(console,`Error ${error}`));
     }
 
+    @httpGet('/:idloja')
     getById(req : Request, res : Response){
         let _id = req.params.idloja;
+
+        console.log('_id:',_id)
 
         LojasService.getById(_id)
         .then(loja => res.status(HttpStatus.OK).json({data : loja}))
