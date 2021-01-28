@@ -1,4 +1,5 @@
 import LojasRepository from '../repository/lojasRepository'
+import { v4 as uuidv4 } from 'uuid';
 
 class LojasServices {
 
@@ -7,6 +8,7 @@ class LojasServices {
     }   
     
     create(novaLoja){
+        novaLoja.versao = uuidv4();
         return LojasRepository.create(novaLoja);
     }
 

@@ -19,7 +19,7 @@ class LojasController {
     }
 
     getById(req : Request, res : Response){
-        let _id = req.params.id;
+        let _id = req.params.idloja;
 
         LojasService.getById(_id)
         .then(loja => res.status(HttpStatus.OK).json({data : loja}))
@@ -27,7 +27,7 @@ class LojasController {
     }
 
     deleteById(req : Request, res : Response){
-        let _id = req.params.id;
+        let _id = req.params.idloja;
 
         LojasService.deleteById(_id)
         .then(() => res.status(HttpStatus.OK).json({message : "Deletado com sucesso"}))
@@ -36,7 +36,7 @@ class LojasController {
 
 
     patchById(req : Request, res : Response){
-        let _id = req.params.id;
+        let _id = req.params.idloja;
         let lojaAtualizada = req.body;
 
         LojasService.patchById(_id,lojaAtualizada)

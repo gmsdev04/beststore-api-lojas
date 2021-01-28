@@ -4,8 +4,8 @@ import idealDeCadastroSchema from './idealDeCadastroSchema'
 const lojasSchema  = new mongoose.Schema({
 
     nome: String ,
-    ideaisDeCadastro : [idealDeCadastroSchema]
+    ideaisDeCadastros : [idealDeCadastroSchema]
     
-},{ collection: 'lojas' });
+},{ collection: 'lojas', versionKey: false });
 
 export default lojasSchema;
