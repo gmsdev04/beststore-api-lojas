@@ -13,29 +13,65 @@ class IdeaisDeCadastrosMongoDb implements IIdeaisDeCadastrosRepository{
         this._model = mongoose.model('lojas',lojasSchema);
     }
 
-    findById(_lojaId: string, _idealDeCadastroId: string): any {
-        return this._model.aggregate([
+    async findById(_lojaId: string, _idealDeCadastroId: string): Promise<any> {
+        return await this._model.aggregate([
+            [
+              {
+                '$match': {
+                  '_id': new mongoose.Types.ObjectId(_lojaId)
+                }
+              }, {
+                '$project': {
+                  'ideaisDeCadastros': {
+                    '$filter': {
+                      'input': '$ideaisDeCadastros', 
+                      'as': 'ideais', 
+                      'cond': {
+                        '$eq': [ '$$ideais._id', new mongoose.Types.ObjectId(_idealDeCadastroId)]
+                      }
+                    }
+                  }
+                }
+              }, {
+                '$replaceRoot': {
+                  'newRoot': {
+                    'data': '$ideaisDeCadastros'
+                  }
+                }
+              }
+            ]
+          ]);
+    }
+
+    async findByTipo(_lojaId: string, tipo: string): Promise<any> {
+      return await this._model.aggregate([
+          [
             {
               '$match': {
                 '_id': new mongoose.Types.ObjectId(_lojaId)
               }
             }, {
-              '$unwind': {
-                'path': '$ideaisDeCadastros'
-              }
-            }, {
-              '$match': {
-                'ideaisDeCadastros._id': new mongoose.Types.ObjectId(_idealDeCadastroId)
-              }
-            }, {
               '$project': {
-                'nome': 0, 
-                '_id': 0
+                'ideaisDeCadastros': {
+                  '$filter': {
+                    'input': '$ideaisDeCadastros', 
+                    'as': 'ideais', 
+                    'cond': {
+                      '$eq': [ '$$ideais.tipo', tipo]
+                    }
+                  }
+                }
+              }
+            }, {
+              '$replaceRoot': {
+                'newRoot': {
+                  'data': '$ideaisDeCadastros'
+                }
               }
             }
-          ]);
-    }
-
+          ]
+        ]);
+  }
 
     
 }

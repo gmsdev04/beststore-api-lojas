@@ -1,6 +1,6 @@
 import LojasService from '../services/lojasService'
 import {Request, Response} from 'express'
-import { BaseHttpController, controller, httpDelete, httpGet, httpPatch, httpPost } from 'inversify-express-utils';
+import { BaseHttpController, controller, httpDelete, httpGet, httpPatch, httpPost, requestParam } from 'inversify-express-utils';
 import { inject } from 'inversify';
 
 @controller('/api/v1/lojas')
@@ -14,16 +14,15 @@ class LojasController extends BaseHttpController{
     }
 
     @httpGet('/:idloja')
-    private async getById(req : Request, res : Response) : Promise<any>{
-        let _id = req.params.idloja;
-
-        return await this.lojasService.getById(_id)
+    async getById(@requestParam("idloja") idloja : string) : Promise<any>
+    {
+        return await this.lojasService.getById(idloja)
             .then(loja => this.ok({data : loja}))
             .catch(error =>console.error.bind(console,`Error ${error}`));
     }
 
      @httpPost('')
-     private async post(req : Request, res : Response) : Promise<any>{
+    async post(req : Request, res : Response) : Promise<any>{
          let novaLoja = req.body;
         
          return await this.lojasService.create(novaLoja)
@@ -31,19 +30,16 @@ class LojasController extends BaseHttpController{
          .catch(error => console.error.bind(console,`Error ${error}`));
      }
 
-    
-
     @httpDelete('/:idloja')
-    private async deleteById(req : Request, res : Response){
-        let _id = req.params.idloja;
-
-        return await this.lojasService.deleteById(_id)
+    async deleteById(@requestParam("idloja") idloja : string){
+  
+        return await this.lojasService.deleteById(idloja)
         .then(() => this.ok({message : "Deletado com sucesso"}))
         .catch(error => console.error.bind(console,`Error ${error}`));
     }
 
     @httpPatch('/:idloja')
-    private async patchById(req : Request, res : Response){
+    async patchById(req : Request, res : Response){
         let _id = req.params.idloja;
         let lojaAtualizada = req.body;
 

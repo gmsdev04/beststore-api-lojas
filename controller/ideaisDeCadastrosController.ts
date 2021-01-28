@@ -1,5 +1,5 @@
 import * as HttpStatus from 'http-status'
-import { interfaces, controller, httpGet, BaseHttpController} from 'inversify-express-utils'
+import { interfaces, controller, httpGet, BaseHttpController, queryParam, requestParam} from 'inversify-express-utils'
 import { injectable, inject } from "inversify";
 
 import IdeaisDeCadastrosService from '../services/ideaisDeCadastrosService'
@@ -17,14 +17,22 @@ class IdeaisDeCadastrosController extends BaseHttpController{
     }
 
     @httpGet('/:idealcadastroid')
-    private async getById(req : Request, res : Response){
-        let _id = req.params.idloja;
-        let _idealDeCadastroId = req.params.idealcadastroid;
-
-        console.log(_id, _idealDeCadastroId);
+    async getById(@requestParam("idloja") _id : string,
+                          @requestParam("_idealDeCadastroId") _idealDeCadastroId : string)
+    {
 
         return await this.service.getById(_id, _idealDeCadastroId)
-        .then(ideal => this.ok({data : ideal}))
+        .then(ideal => this.ok(ideal))
+        .catch(error => console.error.bind(console,`Error ${error}`));
+    }
+
+    @httpGet('')
+    async getByTipo(@queryParam("tipo") tipo: string,
+                            @requestParam("idloja") _id : string)
+        {
+            
+        return await this.service.getByTipo(_id, tipo)
+        .then(ideal => this.ok(ideal))
         .catch(error => console.error.bind(console,`Error ${error}`));
     }
 
