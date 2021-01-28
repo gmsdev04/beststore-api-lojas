@@ -9,15 +9,13 @@ import {Request, Response} from 'express'
 @controller("/api/v1/lojas/:idloja/ideais-de-cadastros")
 class IdeaisDeCadastrosController extends BaseHttpController{
     
-    post(req : Request, res : Response){
-        let idLoja = req.params.idloja;
-        let novoIdealDeCadastro = req.body;
-        
-        return IdeaisDeCadastrosService.create(idLoja, novoIdealDeCadastro)
-        .then(lojaCriada => res.status(HttpStatus.CREATED).json({data : lojaCriada}))
-        .catch(error => console.error.bind(console,`Error ${error}`));
-    }
+    private service: IdeaisDeCadastrosService;
     
+    constructor(@inject('IdeaisDeCadastrosService') service : IdeaisDeCadastrosService){
+        super();
+        this.service = service;
+    }
+
     @httpGet('/:idealcadastroid')
     private async getById(req : Request, res : Response){
         let _id = req.params.idloja;
@@ -25,7 +23,7 @@ class IdeaisDeCadastrosController extends BaseHttpController{
 
         console.log(_id, _idealDeCadastroId);
 
-        return await IdeaisDeCadastrosService.getById(_id, _idealDeCadastroId)
+        return await this.service.getById(_id, _idealDeCadastroId)
         .then(ideal => this.ok({data : ideal}))
         .catch(error => console.error.bind(console,`Error ${error}`));
     }
@@ -33,4 +31,4 @@ class IdeaisDeCadastrosController extends BaseHttpController{
   
 }
 
-export default new IdeaisDeCadastrosController();
+export default IdeaisDeCadastrosController;

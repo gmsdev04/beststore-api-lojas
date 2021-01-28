@@ -11,6 +11,11 @@ import  './controller/lojasController'
 import ILojasRepository from './repository/ILojasRepository'
 import LojasRepositoryMongoDb from './repository/impl/lojasRepositoryMongoDb'
 import LojasService from './services/lojasService'
+import IdeaisDeCadastrosService from "./services/ideaisDeCadastrosService";
+import IIdeaisDeCadastrosRepository from "./repository/IIdeaisDeCadastrosRepository";
+import IdeaisDeCadastrosMongoDb from "./repository/impl/ideaisDeCadastrosMongoDb";
+
+
 class StartUp{
     public server: InversifyExpressServer;
     private _db : Database;
@@ -35,7 +40,9 @@ class StartUp{
 
     configureDependencyInjection(){
         this.container.bind<ILojasRepository>('ILojasRepository').to(LojasRepositoryMongoDb);
-        this.container.bind<LojasService>('LojasService').to(LojasService).inSingletonScope();
+        this.container.bind<LojasService>('LojasService').to(LojasService);
+        this.container.bind<IIdeaisDeCadastrosRepository>('IIdeaisDeCadastrosRepository').to(IdeaisDeCadastrosMongoDb);
+        this.container.bind<IdeaisDeCadastrosService>('IdeaisDeCadastrosService').to(IdeaisDeCadastrosService);
     }
 
     enableCors(app : Application){
