@@ -5,13 +5,12 @@ import { Container } from 'inversify';
 import { InversifyExpressServer, TYPE } from 'inversify-express-utils';
 import { Application } from "express";
 
-
-
 import Database from  './configuration/database'
-import LojasController from './controller/lojasController'
 import  './controller/ideaisDeCadastrosController'
 import  './controller/lojasController'
-
+import ILojasRepository from './repository/ILojasRepository'
+import LojasRepositoryMongoDb from './repository/impl/lojasRepositoryMongoDb'
+import LojasService from './services/lojasService'
 class StartUp{
     public server: InversifyExpressServer;
     private _db : Database;
@@ -22,15 +21,21 @@ class StartUp{
         this.server =  new InversifyExpressServer(this.container);
         this._db = new Database();
         this._db.createConnection();
-   
+        this.configureServer();
+        this.configureDependencyInjection();
     }
 
-    configServer(){
+    configureServer(){
         this.server.setConfig((app) =>{
             app.use(bodyParser.urlencoded({ extended: false}));
             app.use(bodyParser.json());
             this.enableCors(app);
         })
+    }
+
+    configureDependencyInjection(){
+        this.container.bind<ILojasRepository>('ILojasRepository').to(LojasRepositoryMongoDb);
+        this.container.bind<LojasService>('LojasService').to(LojasService).inSingletonScope();
     }
 
     enableCors(app : Application){
@@ -41,24 +46,6 @@ class StartUp{
         app.use(cors(options)); 
     }
 
-  
-
-    routes(){
-        // this.app.route('/').get((req,res) => {
-        //     res.send({ versao: '0.0.1'})
-        // })
-        
-        // //lojas
-        // this.app.route('/api/v1/lojas').get(LojasController.get);
-        // this.app.route('/api/v1/lojas').post(LojasController.post);
-        // this.app.route('/api/v1/lojas/:idloja').get(LojasController.getById);
-        // this.app.route('/api/v1/lojas/:idloja').patch(LojasController.patchById);
-        // this.app.route('/api/v1/lojas/:idloja').delete(LojasController.deleteById);
-        
-        // //ideiais de cadastros
-        // this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros').post(IdeaisDeCadastrosController.post);
-        // this.app.route('/api/v1/lojas/:idloja/ideais-de-cadastros/:idealcadastroid').get(IdeaisDeCadastrosController.getById);
-    }
 
 }
 

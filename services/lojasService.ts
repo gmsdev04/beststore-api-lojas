@@ -1,28 +1,27 @@
-import LojasRepository from '../repository/lojasRepository'
+import ILojasRepository from '../repository/ILojasRepository'
 import { v4 as uuidv4 } from 'uuid';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 class LojasServices {
-
-    get(){
-        return LojasRepository.find({});
-    }   
-    
-    create(novaLoja){
-        novaLoja.versao = uuidv4();
-        return LojasRepository.create(novaLoja);
-    }
+    constructor( @inject("ILojasRepository") private repository: ILojasRepository ) {}
 
     getById(_id){
-        return LojasRepository.findById(_id);
+        return this.repository.findById(_id);
+    }
+        
+    async create(novaLoja){
+         novaLoja.versao = uuidv4();
+         return this.repository.create(novaLoja);
+     }
+
+    async deleteById(_id) : Promise<any> {
+       return await this.repository.findByIdAndDelete(_id);
     }
 
-    deleteById(_id){
-        return LojasRepository.findByIdAndDelete(_id);
-    }
-
-    patchById(_id, lojaAtualizacao){
-        return LojasRepository.findByIdAndUpdate(_id,lojaAtualizacao,{new: true});
+    async patchById(_id, lojaAtualizacao) : Promise<any>{
+        return await this.repository.findByIdAndUpdate(_id,lojaAtualizacao);
     }
 }
 
-export default new LojasServices();
+export default  LojasServices;
